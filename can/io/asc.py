@@ -405,7 +405,7 @@ class ASCWriter(FileIOMessageWriter):
             self.started = self.last_timestamp
             mlsec = repr(self.last_timestamp).split(".")[1][:3]
             formatted_date = time.strftime(
-                self.FORMAT_DATE.format(mlsec), time.localtime(self.last_timestamp)
+                self.FORMAT_DATE.format(mlsec), time.gmtime(self.last_timestamp)
             )
             self.file.write(f"Begin Triggerblock {formatted_date}\n")
             self.header_written = True
