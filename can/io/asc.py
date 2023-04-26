@@ -452,7 +452,7 @@ class ASCWriter(FileIOMessageWriter):
                 symbolic_name="",
                 brs=1 if msg.bitrate_switch else 0,
                 esi=1 if msg.error_state_indicator else 0,
-                dlc=len2dlc(msg.dlc),
+                dlc=msg.dlc,
                 data_length=len(msg.data),
                 data=" ".join(data),
                 message_duration=0,

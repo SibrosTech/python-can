@@ -464,7 +464,7 @@ class BLFWriter(FileIOMessageWriter):
                 0,  # flags
                 0,  # ecc
                 0,  # position
-                len2dlc(msg.dlc),
+                msg.dlc,
                 0,  # frame length
                 arb_id,
                 0,  # ext flags
@@ -480,7 +480,7 @@ class BLFWriter(FileIOMessageWriter):
             data = CAN_FD_MSG_STRUCT.pack(
                 channel,
                 flags,
-                len2dlc(msg.dlc),
+                msg.dlc,
                 arb_id,
                 0,
                 0,
@@ -507,12 +507,10 @@ class BLFWriter(FileIOMessageWriter):
             text = text.encode("mbcs")
         except LookupError:
             text = text.encode("ascii")
-        comment = b"Added by python-can"
-        marker = b"python-can"
         data = GLOBAL_MARKER_STRUCT.pack(
-            0, 0xFFFFFF, 0xFF3300, 0, len(text), len(marker), len(comment)
+            0, 0xFFFFFF, 0xFF3300, 0, len(text)
         )
-        self._add_object(GLOBAL_MARKER, data + text + marker + comment, timestamp)
+        self._add_object(GLOBAL_MARKER, data + text, timestamp)
 
     def _add_object(self, obj_type, data, timestamp=None):
         if timestamp is None:
