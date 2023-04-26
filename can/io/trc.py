@@ -316,7 +316,7 @@ class TRCWriter(FileIOMessageWriter):
         self.file.writelines(line + "\n" for line in lines)
 
     def _write_header_V2_1(self, start_time: datetime) -> None:
-        header_time = start_time - datetime(year=1970, month=1, day=1)
+        header_time = start_time - datetime(year=1899, month=12, day=30)
         lines = [
             ";$FILEVERSION=2.1",
             f";$STARTTIME={header_time/timedelta(days=1)}",
