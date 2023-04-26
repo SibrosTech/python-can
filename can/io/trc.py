@@ -369,6 +369,7 @@ class TRCWriter(FileIOMessageWriter):
 
         return self._format_message_by_format(msg, channel)
 
+
     def write_header(self, timestamp: float) -> None:
         # write start of file header
         start_time = datetime.utcfromtimestamp(timestamp)
