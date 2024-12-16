@@ -367,13 +367,8 @@ class ASCWriter(FileIOMessageWriter):
 
         self.channel = channel
 
-        # write start of file header
-        now = datetime.now().strftime(self.FORMAT_START_OF_FILE_DATE)
-        # Note: CANoe requires that the microsecond field only have 3 digits
-        idx = now.index(".")  # Find the index in the string of the decimal
-        # Keep decimal and first three ms digits (4), remove remaining digits
-        now = now.replace(now[idx + 4 : now[idx:].index(" ") + idx], "")
-        self.file.write(f"date {now}\n")
+        start_time = self._format_header_datetime(datetime.now())
+        self.file.write(f"date {start_time}\n")
         self.file.write("base hex  timestamps absolute\n")
         self.file.write("internal events logged\n")
 
@@ -382,10 +377,25 @@ class ASCWriter(FileIOMessageWriter):
         self.last_timestamp = 0.0
         self.started = 0.0
 
+    def _format_header_datetime(self, dt: datetime) -> str:
+        # Note: CANoe requires that the microsecond field only have 3 digits
+        # Since Python strftime only supports microsecond formatters, we must
+        # manually include the millisecond portion before passing the format
+        # to strftime
+        msec = dt.microsecond // 1000 % 1000
+        format_w_msec = self.FORMAT_DATE.format(msec)
+        return dt.strftime(format_w_msec)
+    
     def stop(self) -> None:
         # This is guaranteed to not be None since we raise ValueError in __init__
         if not self.file.closed:
             self.file.write("End TriggerBlock\n")
+            if self.started is not None:
+                start_time = self._format_header_datetime(datetime.fromtimestamp(self.started))
+                self.file.seek(0)
+                self.file.write(f"date {start_time}\n")
+            else:
+                logger.warning("No messages logged; 'started' timestamp is None.")
         super().stop()
 
     def log_event(self, message: str, timestamp: Optional[float] = None) -> None:
